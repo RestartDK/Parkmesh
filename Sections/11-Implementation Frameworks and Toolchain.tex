@@ -1,0 +1,25 @@
+\subsection{Implementation Frameworks and Toolchain}
+
+To build the Parking Mesh system end-to-end, we begin entirely in software. A microscopic traffic simulator such as \textbf{CityFlow} lets us import the full Madrid road graph (via OpenStreetMap) and run hundreds of thousands of vehicles faster than real time, while exposing a Python API that integrates directly into a custom \texttt{ParkingMeshEnv}. When richer perception and sensor noise are needed, we can replay the same episodes inside \textbf{CARLA}, or if traffic-signal logic becomes a concern, replace CityFlow with \textbf{SUMO} using the \texttt{SUMO-RL} Gym wrapper. All three simulators support the standard \texttt{observation}/\texttt{step}/\texttt{reset} interface, keeping experimentation seamless.
+
+On the learning side, we use \textbf{PettingZoo} to wrap the simulator in a standard multi-agent API and control it using \textbf{Ray RLlib}. RLlib includes scalable implementations of \textbf{Soft Actor-Critic}, centralised critic templates, replay buffers, and elastic rollout workers—so we only need to register our \texttt{MAGAC} model. This model is implemented in \textbf{PyTorch}, with the graph-attention critic built using just two calls to \texttt{torch\_geometric.nn.GATConv} from \textbf{PyTorch Geometric} (or equivalent layers in \textbf{DGL} if preferred). Because the message-passing layers operate on sparse adjacency matrices, the critic scales linearly with the number of Bluetooth edges—even when simulating four million grid cells.
+
+Training at city scale requires multiple GPUs. A small \textbf{Ray cluster} orchestrated by \textbf{Docker Compose} spins up dozens of rollout workers, each responsible for simulating a different tile of Madrid. Docker—running with the \texttt{nvidia} runtime—ensures a reproducible software stack. Adding compute is as simple as:
+
+\begin{quote}
+\texttt{docker compose up --scale worker=32}
+\end{quote}
+
+If the critic eventually grows large enough to require multi-GPU synchronization, we can integrate \textbf{Horovod} from UBER to perform all-reduce gradient updates without changing the model code.
+
+\vspace{1em}
+
+\noindent\textbf{Implementation proceeds in three phases:}
+
+\begin{enumerate}
+    \item \textbf{Prototype:} Wrap CityFlow, implement the MAGAC model, and train until convergence on a one-square-kilometre patch using a single GPU.
+    
+    \item \textbf{Scale-out:} Distribute training across a Ray cluster, introduce curriculum learning from light to rush-hour demand, and demonstrate convergence across the entire Madrid road graph.
+    
+    \item \textbf{Hardware-in-the-loop:} Compile the trained actor to \texttt{ONNX} and deploy to a two-district pilot with several hundred real vehicles. The same toolchain supports nightly fine-tuning using live telemetry, enabling Parking Mesh to evolve from a research prototype into a continuously adapting, city-scale infrastructure layer.
+\end{enumerate}

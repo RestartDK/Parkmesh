@@ -1,0 +1,83 @@
+% Author Name: José Areia 
+% Author Contact: jose.apareia@gmail.com
+% Version: 1.0.3 - 18/04/2025
+% Public Repository: https://github.com/joseareia/nob-article
+
+% Packages & Document Configurations
+\documentclass[twocolumn]{NobArticle}
+\runninghead{Parking Mesh: RL-Based Urban Parking Network}
+\footertext{\textit{IE University} (May 2025)}
+\usepackage{caption}
+\captionsetup{justification=centering, singlelinecheck=false}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{placeins}
+\usepackage{ragged2e}   
+\usepackage{flafter}
+
+% Title
+\title{Parking Mesh: A Reinforcement Learning-Driven Vehicle Network for Real-Time Urban and Decentralized Parking Optimization}
+
+% Authors
+\author{
+    Paul Ruiz Alliata, 
+    Daniel Kumlin,
+    Alberto Puliga,
+    Daniel Alves Rosel, 
+    and Tomás Mesalles Mejía
+}
+
+% Affiliations
+\date{
+    IE University School of Science and Technology
+}
+
+% Executive Summary
+\renewcommand{\maketitlehookd}{%
+\vspace{2em}
+\noindent\textbf{\Large Executive Summary}\par
+\vspace{0.5em}
+\noindent
+Parking Mesh transforms every parked vehicle into a node within a city-wide mesh network that senses adjacent parking gaps and relays real-time vacancy data. By equipping cars with four ultra-low-power proximity sensors and a Bluetooth-mesh microcontroller, we create a self-organizing network that dynamically feeds into a live parking map, minimizing search traffic, cutting emissions, and saving drivers valuable time.    
+\medskip
+
+\small{\textbf{Index Terms:} Smart Parking, Multi-Agent Systems, Reinforcement Learning, Bluetooth Mesh, Graph Neural Networks, Urban Mobility, Real-Time Sensing, Decentralised Infrastructure}
+
+}
+
+
+\begin{document}
+
+\small
+\maketitle
+
+\section{Business Introduction}
+\input{Sections/01-Problem}
+\input{Sections/02-Solution}
+\input{Sections/03-Value Proposition} 
+\input{Sections/04-Target Persona}  
+\input{Sections/05-Use Case}        
+
+\section{Reinforcement Learning Framework}
+\input{Sections/06-Environment and Actions} 
+\input{Sections/07-Reward Function}
+
+\section{Model Architecture and Setup}
+\input{Sections/08-Model Selection and Definition}
+\input{Sections/09-Training Paradigm}
+\input{Sections/10-Hyperparameters}                                          
+
+\section{Operationalization and Deployment}
+\input{Sections/11-Implementation Frameworks and Toolchain}
+\input{Sections/12-MLOps}
+\input{Sections/13-Risk Mitigation Measures}
+\input{Sections/14-Virtuous Data Cycle}
+
+\section*{Acknowledgements}
+This research project received support during the Reinforcement Learning course, instructed by Professor José Manuel Rey Gonzalez, teacher at the School of Science and Technology of IE University.
+
+\section{Bibliography}
+\printbibliography
+
+\end{document}

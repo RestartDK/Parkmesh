@@ -1,0 +1,62 @@
+\subsection{Hyperparameters}
+\subsubsection*{1. SAC Network Architecture and Optimization Setup}
+
+Both actor and critic networks are trained using the \textbf{Adam optimizer} with standard parameters (\( \beta_1 = 0.9 \), \( \beta_2 = 0.999 \), \( \epsilon = 1 \times 10^{-8} \)), ensuring robust convergence even under the non-stationarity induced by simultaneously learning agents—each representing a vehicle acting in the environment. 
+
+We set the discount factor \( \gamma = 0.99 \) to balance short-term incentives (e.g., immediately reporting nearby parking spots) with longer-term cooperative benefits (such as improving downstream coverage for other drivers). 
+
+Actor and critic learning rates are initially set to \( 3 \times 10^{-4} \), though we often accelerate the critic to \( 6 \times 10^{-4} \) to improve value convergence. \textbf{Gradient clipping} at a global norm of 0.8 prevents training spikes caused by rare but impactful transitions, such as sudden multi-spot vacancies. 
+
+Finally, we apply \textbf{cosine annealing schedules} to both learning rates, gradually reducing them over time to stabilize late-stage policy refinement.
+
+\vspace{1em}
+
+\subsubsection*{2. Automatic Entropy Tuning in SAC}
+
+To maintain effective exploration during training, we employ \textbf{automatic entropy temperature tuning} for the actor policy. In the Soft Actor-Critic (SAC) framework, the policy seeks to maximize both expected return and entropy. The objective becomes:
+
+\[
+J_\pi = \mathbb{E}_{(s, a) \sim \pi} \left[ Q(s, a) - \alpha \log \pi(a|s) \right]
+\]
+
+Here, \( \alpha \) is the entropy temperature, which controls the trade-off between exploitation and exploration. Rather than fixing \( \alpha \), we adaptively tune it during training to match a target policy entropy \( \mathcal{H}_{\text{target}} \). For discrete action spaces, we follow the convention:
+
+\[
+\mathcal{H}_{\text{target}} = -\log |A_i|
+\]
+
+where \( |A_i| \) is the number of discrete actions available to agent \( i \). This encourages early stochasticity and progressively sharper policies as learning progresses. The entropy target is optimized using a separate \textbf{Adam optimizer} (learning rate \( 3 \times 10^{-4} \)), adjusting \( \alpha \) to minimize the KL divergence between the actual and target entropy.
+
+This mechanism is especially valuable in our multi-agent parking setting, where deterministic policies risk early convergence to suboptimal regions or information bottlenecks in the city grid.
+
+\vspace{1em}
+
+\subsubsection*{3. Graph Neural Network Hyperparameters}
+
+To stabilize training across varying graph sizes, we apply \textbf{layer normalization} after each aggregation step and include \textbf{residual connections}. 
+
+Edge features consist of relative GPS offsets (\( \Delta x, \Delta y \)) and link quality (RSSI), giving three additional dimensions to inform the GNN of both spatial geometry and communication reliability. We apply dropout with \( p = 0.1 \) on the second GNN layer to prevent overfitting to frequent traffic patterns.
+
+All GNN weights are optimized with Adam (using the same configuration as MLPs) to allow smooth adaptation to the evolving mesh topology.
+
+\vspace{1em}
+
+\subsubsection*{4. Multi-Agent Training Hyperparameters}
+
+During real-time deployment, the number of agents equals the number of active app users in Madrid—potentially tens of thousands—each executing only its local actor policy. 
+
+For centralized training, we simulate a representative subset (e.g., 500–1,000 agents) to remain within GPU constraints, rotating through random city sectors to expose the network to varied traffic densities.
+
+Rollouts are fully off-policy with a rollout length of 1, enabling continual collection of transitions without resets—matching the always-on nature of parking dynamics. The critic is updated every environment step, while the actor is updated every two critic steps (1:2 ratio), ensuring policy changes are guided by accurate value estimates.
+
+\textbf{Target network delays} of 3 updates are applied (Polyak updates occur only after three critic steps), reducing the variance in value targets. Gradients are clipped at a maximum norm of 0.8 to protect stability when abrupt state shifts occur, such as a sudden large-scale vacancy.
+
+\vspace{1em}
+
+\subsubsection*{5. Exploration and Entropy}
+
+To balance exploitation of known parking hotspots with exploration of newly vacated areas, we rely on SAC’s \textbf{automatic entropy tuning}, targeting entropy \( \approx -|A_i| \) for a discrete action space of size around 10.
+
+This dynamic \( \alpha \) tuning eliminates the need for hand-crafted exploration schedules across diverse zones—such as downtown vs. suburban regions.
+
+We also optionally add \textbf{Gaussian action noise} with \( \sigma = 0.15 \) to the actor’s categorical logits prior to sampling. This smooths decision boundaries between similar actions (e.g., “broadcast cell (1,0)” vs. “broadcast cell (1,1)”), improving robustness and stochasticity across both dense and sparse regions of the environment.

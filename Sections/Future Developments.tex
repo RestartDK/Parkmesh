@@ -1,0 +1,23 @@
+\subsection{Future Developments}
+
+Looking ahead, the Parking Mesh system presents numerous opportunities for advancement across hardware, software, and deployment dimensions. These developments aim to enhance real-world effectiveness, support broader adoption, and elevate the overall impact on urban mobility.
+
+\subsubsection*{Edge Hardware Evolution}
+
+We plan to evolve our sensing hardware by integrating additional sensor modalities such as low-cost cameras, GPS-IMUs, or radar for more accurate spatial mapping. Incorporating real-time sensor fusion on edge devices will enable improved detection of dynamic changes like double-parking or temporary construction. Additionally, migrating from basic microcontrollers to edge AI chips (e.g., NVIDIA Jetson Nano or Google Coral) will enable in-situ inference and local decision-making without reliance on centralized cloud infrastructure.
+
+\subsubsection*{Adaptive Reward Tuning}
+
+Future versions of the reinforcement learning component will adopt meta-learning techniques to dynamically adjust reward functions based on traffic density, user behavior, and parking demand fluctuations. This will ensure robust agent behavior in evolving urban conditions and allow agents to generalize across cities without extensive retraining. Moreover, we envision integrating personalized agent objectives based on user preferences (e.g., proximity to entrance, price sensitivity) through multi-objective RL.
+
+\subsubsection*{Federated Learning Deployment}
+
+To preserve data privacy and reduce transmission overhead, we aim to implement federated learning. This will allow local vehicle policies to be trained on-device and periodically synced via encrypted updates, enabling continuous learning while safeguarding user data. Such a model is particularly suited to a privacy-sensitive application like parking, where location data is inherently personal.
+
+\subsubsection*{Interoperability with Smart Infrastructure}
+
+Our roadmap includes integration with existing and emerging smart city infrastructure such as traffic signals, toll systems, and municipal IoT networks. Bidirectional communication with these systems can provide additional contextual data (e.g., event-based congestion, road closures) and enable coordinated city-wide optimizations beyond parking.
+
+\subsubsection*{Real-World Pilot Scaling}
+
+Following initial two-district pilots, we intend to expand into larger urban zones with varying topology, socioeconomic demographics, and vehicle types. This scaling will test the robustness of our system under heterogeneous conditions. Longitudinal studies will assess environmental impact, user behavior shifts, and economic outcomes, generating policy-relevant insights for municipalities.
