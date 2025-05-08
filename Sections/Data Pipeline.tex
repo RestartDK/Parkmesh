@@ -1,21 +1,21 @@
-\subsection{Data Pipeline}
+
 
 The Parking Mesh system relies on a robust and scalable data pipeline to collect, process, and transform sensor and communication data into actionable learning signals and real-time driver guidance. This pipeline supports both the training of reinforcement learning agents and operational decision-making during live deployment.
 
-\subsubsection{Data Sources}
+\subsection{Data Sources}
 Our system draws from three primary data sources. First, vehicle-based sensors such as proximity detectors identify adjacent parking vacancies. Optional enhancements like GPS, inertial measurement units, or cameras provide additional spatial and contextual information. Second, vehicles exchange real-time messages using Bluetooth mesh communication, reporting observed parking statuses and relaying received data. Third, simulated environments, particularly CityFlow and CARLA, generate synthetic traffic data across diverse urban conditions, supporting controlled, large-scale experimentation during model development.
 
-\subsubsection{Ingestion and Preprocessing}
+\subsection{Ingestion and Preprocessing}
 Raw data is ingested through several mechanisms. Edge aggregation modules running on each vehicle process sensor input, apply noise filtering, batch events, and assign timestamps before broadcasting. During centralized training, this data is uploaded to replay buffers via secure Wi-Fi or cellular connections. In parallel, all spatial inputs, such as GPS coordinates, are normalized and mapped to a grid-based city representation that aligns with the system’s reinforcement learning environment.
 
-\subsubsection{Feature Extraction}
+\subsection{Feature Extraction}
 Each incoming data point is converted into a structured vector. This includes the binary or probabilistic occupancy status of a cell, metadata such as zoning type, time-of-day, and parking regulations, as well as the vehicle’s relative position and movement direction. Communication attributes such as message latency or Bluetooth signal strength are also embedded. These feature vectors are used both by actor-critic networks during training and by real-time inference modules during deployment.
 
-\subsubsection{Labeling and Reward Shaping}
+\subsection{Labeling}
 In simulation and pilot deployments, ground truth labels—such as confirmed successful parking or collisions—are generated to support auxiliary supervised losses and improved reward shaping. This feedback improves early-stage learning and helps agents converge more efficiently by reinforcing useful behaviors.
 
-\subsubsection{Storage and Query Interface}
+\subsection{Storage and Query Interface}
 All processed data is stored in a structured format that supports rapid querying and batch training. We use file formats such as Parquet and TFRecords for compact storage. For similarity search and trajectory analysis, we employ vector databases, while time-series stores like InfluxDB track system-level performance over time.
 
-\subsubsection{Feedback Loop for Online Learning}
+\subsection{Feedback Loop for Online Learning}
 During deployment, anonymized performance logs—such as parking success rates and rerouting frequencies—are funneled back into the training pipeline. This enables continual policy refinement through online learning, allowing Parking Mesh to remain responsive to changing urban dynamics and driver behaviors.
